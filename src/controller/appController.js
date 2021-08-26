@@ -62,16 +62,6 @@ const podcastMedia = multer({
     }
 })
 
-
-const index = [
-    (req, res)=>{
-        res.status(200).json({
-            status: 200,
-            message: 'hello'
-        })
-    }
-]
-
 const signinCont = [
     async(req, res)=>{
         const {email, password } = req.body
@@ -270,13 +260,13 @@ const paysubscriptionCont = [
     requireAuth, async(req, res)=>{
         try {
             const { email } = req.user
-            const { type } = req.body
+            const { transactionId, paymentMode, type, price, currency} = req.body
 
-            if(!type){
-                throw new Error("missing subscription type")
+            if(!transactionId || !paymentMode || !type || !price || !currency){
+                throw new Error("missing required information")
             }
 
-            const subscription = await paysubscription(email, type)
+            const subscription = await paysubscription(email, transactionId, paymentMode, type, price, currency)
             return res.status(200).json({statusCode: 200, status: 'successfull', message: 'buy subscription sucessfull', subscription})
         } catch (error) {
             return res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
@@ -366,7 +356,6 @@ const notFound = [
 ]
 
 module.exports = {
-    index,
     signinCont,
     signupCont,
     podcasts,

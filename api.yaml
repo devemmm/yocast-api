@@ -1,0 +1,629 @@
+swagger: "2.0"
+info:
+  title: YOCAST - API
+  description: this is any api that wil controll yocast application for both mobile and and web application. developed by @devemm for more information contact us on +250 788 596 281 
+  version: 1.0
+  contact:
+    email: djntivuguruzwaemmanuel@gmail.com
+  liscence:
+    name: Apache 2.0
+    url: "http://apache.org/"
+  servers:
+    -url: "http://localhost:3002"
+    description: this is my localhost
+    -url: "http://company.com"
+    description: this is my company server
+
+schemes: [http, https]
+
+tags:
+  name: User
+  description: YoCast User routes
+
+tags:
+  name: Admin
+  description: Yocast user routes
+
+paths:
+  # create account
+  /signup:
+    post:
+      tags: [User]
+      summary: this route return account information if everything went right
+      description: signup routes
+      procedures:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/components/schemas/User"
+      responses:
+        201:
+          desciption: successfull
+          schema:
+            type: object
+            example: {statusCode: 201, status: "successfull", message: "account created successfull", user: { email: "user@gmail.com", names: "NTIVUGURUZWA Emmanuel", country: "Rwanda", phone: null, type: "user", status: "active", avatar: "https://yocast-api.nextreflexe.com/images/avatar/default-avatar.jpg", password: "$2b$08$PqPcjhiSnviK6AYvel3zIe9BfDiGV.v1UimpGB4.N6wIpIonnQL4S", createdAt: "2021-08-25T06:51:57.000Z", updatedAt: "2021-08-25T06:51:57.000Z", token: { owner: "user@gmail.com", token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTA2OTQxfQ.2Zfjc_A4eSVY1kEOsoq4XWIKqPypx2NIrkEfKkYNA3k", updatedAt: "2021-08-25T15:55:41.633Z", createdAt: "2021-08-25T15:55:41.633Z"}}}
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: {error: {statusCode: 400, status: "failed", message: "email required"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+# login
+  /login:
+    post:
+      tags: [User]
+      summary: login routes
+      description: this is a post route for signin
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            example: {email: "user@gmail.com", password: "Exwjew!1204@"}
+      responses:
+        200:
+          description: sucessfull
+          schema:
+            type: object
+            example: {statusCode: 200, status: "successfull", message: "you are logged in", user: { email: "user@gmail.com", names: "NTIVUGURUZWA Emmanuel", country: "Rwanda", phone: null, type: "user", status: "active", avatar: "https://yocast-api.nextreflexe.com/images/avatar/default-avatar.jpg", password: "$2b$08$PqPcjhiSnviK6AYvel3zIe9BfDiGV.v1UimpGB4.N6wIpIonnQL4S", createdAt: "2021-08-25T06:51:57.000Z", updatedAt: "2021-08-25T06:51:57.000Z", token: { owner: "user@gmail.com", token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTA2OTQxfQ.2Zfjc_A4eSVY1kEOsoq4XWIKqPypx2NIrkEfKkYNA3k", updatedAt: "2021-08-25T15:55:41.633Z", createdAt: "2021-08-25T15:55:41.633Z"}}}
+        400:
+          description: something went wrong => if email or password was not specified or when you provide wrong email or password
+          schema:
+            type: object
+            example: {error: {statusCode: 400, status: "failed", message: "wrong password"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+  /user/signout:
+    post:
+      tags: [User]
+      summary: log out from all device that was logged in with your email
+      parameters:
+      - in: headers
+        mame: Authorization
+        type: String
+        required: true
+        description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+      - in: query
+        name: all
+        type: string
+        enum: [true]
+      responses:
+        200:
+          description: successfull
+          schema:
+            type: object
+            example: {statusCode: 200, status: "successfull", message: "signout done", result: 2}
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: { error: {statusCode: 400, status: "failed", message: "error not specified"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token expired please signin again"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+# SIGNOUT IN CURRENT DEVICE
+  /user/signoutt:
+    post:
+      tags: [User]
+      summary: "signout"
+      parameters:
+      - in: headers
+        mame: Authorization
+        type: String
+        required: true
+        description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+      responses:
+        200:
+          description: successfull
+          schema:
+            type: object
+            example: {statusCode: 200, status: "successfull", message: "signout done", result: 2}
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: { error: {statusCode: 400, status: "failed", message: "error not specified"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token expired please signin again"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+
+# FETCH ALL PODCAST IN DATABASE
+  /podcasts:
+    get:
+      tags: [User]
+      summary: get all podcast in database
+      description: this routes require Authorization in Headers "it is Bearer token"
+      parameters:
+      - in: headers
+        mame: Authorization
+        type: String
+        required: true
+        description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+      responses:
+        200:
+          description: sucessfull
+          schema:
+            type: object
+            example: {statusCode: 200, status: "sucessfull", podcast: [{id: 1, owner: "admin@gmail.com", name: "Ese Birashoboka ko umukobwa yaba umuhungu", url: "https://yocast-api.nextreflexe.com/videos/podcasts/2021-08-25T06:57:22.813Zteni.MP4", cover: "https://yocast-api.nextreflexe.com/images/background/yocast.jpeg", category: "Business, Education", description: "kurikira ikiganiro", price: 500, likes: 0, views: 0,isFree: false, createdAt: "2021-08-25T06:57:23.000Z", updatedAt: "2021-08-25T06:57:23.000Z"},{ id: 3, owner: "admin@gmail.com", name: "UMUJURA WEMEJE IKIGO CYO MU BWONGEREZA YIBA MILIYARI 610_ AYA MAFRW Y'IKORANABUHANGA ARAGOYE", url: "https://yocast-api.nextreflexe.com/videos/podcasts/2021-08-25T10:37:05.679ZUMUJURA WEMEJE IKIGO CYO MU BWONGEREZA YIBA MILIYARI 610- AYA MAFRW Y'IKORANABUHANGA ARAGOYE.mp4",cover: "https://yocast-api.nextreflexe.com/images/background/yocast.jpeg", category: "Business, Education, Technology", description: "KURIKIRA IKIGANIRO WUMVE UMUJURA WEMEJE IKIGO CYO MU BWONGEREZA YIBA MILIYARI 610_ AYA MAFRW Y'IKORANABUHANGA ARAGOYE", price: 3620, likes: 0, views: 0, isFree: false, createdAt: "2021-08-25T10:37:05.000Z", updatedAt: "2021-08-25T10:37:05.000Z"},{id: 4, owner: "admin@gmail.com", name: "BEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI", url: "https://yocast-api.nextreflexe.com/videos/podcasts/2021-08-25T10:53:08.948ZBEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI.mp4", cover: "https://yocast-api.nextreflexe.com/images/background/yocast.jpeg", category: "Business, Education, Technology", description: "BEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI", price: 700, likes: 0, views: 0, isFree: false, createdAt: "2021-08-25T10:53:10.000Z", updatedAt: "2021-08-25T10:53:10.000Z"}]}
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: {error: {statusCode: 400, status: "failed", message: "issues not specified"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token required"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+#  tracking viewed podcat
+  /user/listern?podcast=pid:
+    post:
+      tags: [User]
+      summary: this route not trustable
+      parameters:
+      - in: headers
+        mame: Authorization
+        type: String
+        required: true
+        description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+      - in: query
+        name: podcast
+        type: integer
+        description: podcast id
+        required: true
+      responses:
+        200:
+          description: successfull
+          schema:
+            type: object
+            example: { statusCode: 200, status: "sucessfull", podcast: { id: 1, owner: "user@gmail.com", name: "Ese Birashoboka ko umukobwa yaba umuhungu", url: "http://localhost:3000/videos/podcasts/2021-08-24T21:08:55.475Zteni.MP4", cover: "http://localhost:3000/images/background/yocast.jpeg", category: "Business, Education", description: "kurikira ikiganiro", price: 500, likes: 1, views: 1, isFree: false, createdAt: "2021-08-24T21:08:55.000Z", updatedAt: "2021-08-26T14:14:10.169Z"}}
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: { error: {statusCode: 400, status: "failed", message: "error not specified"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token expired please signin again"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+
+# like Podcast
+  /user/podcast?podcast=1&like=true:
+    post:
+      tags: [User]  
+      summary: "like podcast"
+      parameters:
+      - in: headers
+        mame: Authorization
+        type: String
+        required: true
+        description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+      - in: query
+        name: podcast
+        description: podcast id
+        type: integer
+        required: true
+      - in: query
+        name: like
+        type: boolean
+        required: true
+        enum: [true]
+      responses:
+        200:
+          description: successfull
+          schema:
+            type: object
+            example: { statusCode: 200, status: "sucessfull", podcast: { id: 1, owner: "user@gmail.com", name: "Ese Birashoboka ko umukobwa yaba umuhungu", url: "http://localhost:3000/videos/podcasts/2021-08-24T21:08:55.475Zteni.MP4", cover: "http://localhost:3000/images/background/yocast.jpeg", category: "Business, Education", description: "kurikira ikiganiro", price: 500, likes: 1, views: 1, isFree: false, createdAt: "2021-08-24T21:08:55.000Z", updatedAt: "2021-08-26T14:14:10.169Z"}}
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: { error: {statusCode: 400, status: "failed", message: "error not specified"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token expired please signin again"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+# FETCH RECEINT PODCAST
+  /user/podcast?recent=true&category=price:
+    get:
+      tags: [User]
+      summary: filter or sorlt podcast by category
+      parameters:
+      - in: headers
+        mame: Authorization
+        type: String
+        required: true
+        description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+      - in: query
+        name: recent
+        enum: [true]
+        required: true
+      - in: query
+        name: category
+        type: string
+        required: true
+        enum: [price, music, business, education, technology, etc]
+      responses:
+        200:
+          schema:
+            type: object
+            example: { statusCode: 200, status: "successfull", message: "filtered by recient", podcast: [{id: 1, owner: "user@gmail.com", name: "Ese Birashoboka ko umukobwa yaba umuhungu", url: "http://localhost:3000/videos/podcasts/2021-08-24T21:08:55.475Zteni.MP4", cover: "http://localhost:3000/images/background/yocast.jpeg", category: "Business, Education", description: "kurikira ikiganiro", price: 500, likes: 30, views: 158, isFree: false, createdAt: "2021-08-24T21:08:55.000Z", updatedAt: "2021-08-26T14:14:10.000Z"},{ id: 2, owner: "user@gmail.com", name: "UMUJURA WEMEJE IKIGO CYO MU BWONGEREZA YIBA MILIYARI 610_ AYA MAFRW Y'IKORANABUHANGA ARAGOYE", url: "http://localhost:3000/videos/podcasts/2021-08-25T10:17:53.091ZUMUJURA WEMEJE IKIGO CYO MU BWONGEREZA YIBA MILIYARI 610_ AYA MAFRW Y'IKORANABUHANGA ARAGOYE.MP4", cover: "http://localhost:3000/images/background/yocast.jpeg", category: "Business, Education", description: "KURIKIRA IKIGANIRO WUMVE UMUJURA WEMEJE IKIGO CYO MU BWONGEREZA YIBA MILIYARI 610_ AYA MAFRW Y'IKORANABUHANGA ARAGOYE", price: 500, likes: 0, views: 0, isFree: false, createdAt: "2021-08-25T10:17:56.000Z", updatedAt: "2021-08-25T10:17:56.000Z"}]}
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: { error: {statusCode: 400, status: "failed", message: "issues not specified"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token expired please signin again"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+# REGISTER SUBSCRIPTION IN SYSTEM
+  /user/subscription:
+    post:
+      tags: [User]
+      summary: register subscription
+      parameters:
+      - in: headers
+        mame: Authorization
+        type: String
+        required: true
+        description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+      - in: body
+        name: body
+        required: true
+        type: object
+        example: { type: "monthly", transactionId: "efwbfuekwjnbg.weklngwelrkg97665567788", paymentMode: "mobile money", price: 5000, currency: "Rwf"}
+      responses:
+        200:
+          schema:
+            type: object
+            example: {statusCode: 200, status: "successfull", message: "buy subscription sucessfull", subscription: { id: 1, owner: "user@gmail.com", type: "monthly", transactionId: "efwbfuekwjnbg.weklngwelrkg97665567788", paymentMode: "mobile money", price: 5000, currency: "Rwf", desactivationDate: "2021-09-25T13:45:08.203Z", updatedAt: "2021-08-26T13:45:08.206Z", createdAt: "2021-08-26T13:45:08.206Z"}}
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: { error: {statusCode: 400, status: "failed", message: "missing requied information"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token expired please signin again"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+
+#  FETCH LAST SUBSCRIPTION
+  /user/subscription?type=last:
+    get:
+      tags: [User]
+      summary: fetch last user subscription
+      parameters:
+      - in: headers
+        mame: Authorization
+        type: String
+        required: true
+        description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+      - in: query
+        name: type
+        type: string
+        enum: [last]
+        required: true
+      responses:
+        200:
+          schema:
+            type: object
+            example: { statusCode: 200, status: "successfull", message: "subscription",subscription: { id: 1, owner: "user@gmail.com", transactionId: "efwbfuekwjnbg.weklngwelrkg97665567788", paymentMode: "mobile money", type: "monthly", price: 5000, currency: "Rwf", desactivationDate: "2021-09-25T13:45:08.000Z", createdAt: "2021-08-26T13:45:08.000Z", updatedAt: "2021-08-26T13:45:08.000Z"}}
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: { error: {statusCode: 400, status: "failed", message: "error not specified"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token expired please signin again"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+
+# UPDATE ACCOUNT FOR ALL USER EVEN ADMIN
+  /user/account:
+    patch:
+      tags: [User]
+      summary: update account details for all user and admin
+      parameters:
+      - in: headers
+        mame: Authorization
+        type: String
+        required: true
+        description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+      - in: body
+        name: body
+        required: true
+        schema:
+          example: {names: "Emmy Disc Jocker", phone: +250788596281, country: US}
+      responses:
+        200:
+          description: response from router
+          schema:
+            type: object
+            example: {statusCode: 200, status: "successfull", message: "account updated", user: { email: "user@gmail.com", names: "Emmy Disc Jocker", country: "US", phone: +250788596281, type: "user", status: "active", avatar: "https://yocast-api.nextreflexe.com/images/avatar/default-avatar.jpg", password: "$2b$08$PqPcjhiSnviK6AYvel3zIe9BfDiGV.v1UimpGB4.N6wIpIonnQL4S", createdAt: "2021-08-25T06:51:57.000Z", updatedAt: "2021-08-25T06:51:57.000Z", token: { owner: "user@gmail.com", token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTA2OTQxfQ.2Zfjc_A4eSVY1kEOsoq4XWIKqPypx2NIrkEfKkYNA3k", updatedAt: "2021-08-25T15:55:41.633Z", createdAt: "2021-08-25T15:55:41.633Z"}}}
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: { error: {statusCode: 400, status: "failed", message: "error not specified"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token expired please signin again"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+
+# ADMIN ROUTES
+  # upload podcast
+  /admin/podcast:
+    post:
+      tags: [Admin]
+      summary: "post podcast"
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: headers
+          mame: Authorization
+          type: String
+          required: true
+          description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+        - in: formData
+          name: media
+          type: file
+          required: true
+          description: podcat media
+        - in: body
+          name: name
+          type: string
+          required: true
+          schema:
+            type: string
+            example: Ese birashoboka ko abantu bakomeza kuba kwisi hakiri COVID
+        - in: body
+          name: description
+          type: string
+          required: true
+          schema:
+            type: string
+            example: kurikira ikiganiro
+        - in: body
+          name: price
+          type: integer
+          required: true
+          schema:
+            type: string
+            example: 50
+        - in: body
+          name: category
+          type: string
+          required: true
+          schema:
+            type: string
+            example: Business, Education
+      responses:
+        200:
+          description: response from router
+          schema:
+            type: object
+            example: {statusCode: 201, status: "sucessfull", message: "podcast created", podcast: :{cover: "https://yocast-api.nextreflexe.com/images/background/yocast.jpeg", likes: 0, views: 0, isFree: false, id: 5, owner: "admin@gmail.com", name: "BEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI", "description": "BEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI", price": 700, category: "Business, Education, Technology", url: "https://yocast-api.nextreflexe.com/videos/podcasts/2021-08-26T11:11:45.357ZBEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI.mp4", updatedAt: "2021-08-26T11:11:47.003Z", createdAt: "2021-08-26T11:11:47.003Z"}}
+            
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: { error: {statusCode: 400, status: "failed", message: "uploded file must be an .mp4"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token is null"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+        
+
+
+  /admin/podcast/{id}:
+    patch:
+      tags: [Admin]
+      summary: "update podcast route"
+      desciption: "this podcast can be updated with owner"
+      parameters:
+        - in: headers
+          mame: Authorization
+          type: String
+          required: true
+          description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - in: body
+          required: true
+          schema:
+            type: object
+            example: {"name": "updated name", category: "new catategory names"}
+      responses:
+        200:
+          description: response from router
+          schema:
+            type: object
+            example: {statusCode: 200, status: "sucessfull", message: "podcast updated", podcast: :{cover: "https://yocast-api.nextreflexe.com/images/background/yocast.jpeg", likes: 0, views: 0, isFree: false, id: 5, owner: "admin@gmail.com", name: "BEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI", "description": "BEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI", price": 700, category: "Business, Education, Technology", url: "https://yocast-api.nextreflexe.com/videos/podcasts/2021-08-26T11:11:45.357ZBEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI.mp4", updatedAt: "2021-08-26T11:11:47.003Z", createdAt: "2021-08-26T11:11:47.003Z"}}
+            
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: { error: {statusCode: 400, status: "failed", message: "missing some required information"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token is null"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+
+#  delete podcast docs
+  /admin/podcast/{pid}:
+    delete:
+      tags: [Admin]
+      summary: "Listerb podcast"
+      parameters:
+        - in: headers
+          mame: Authorization
+          type: String
+          required: true
+          description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: response from router
+          schema:
+            type: object
+            example: {statusCode: 200, status: sucessfull, message: "delete podcast successfull"}            
+        400:
+          description: something went wrong
+          schema:
+            type: object
+            example: { error: {statusCode: 400, status: "failed", message: "poscast not fount"}}
+        401:
+          description: authorization issues
+          schema:
+            type: object
+            example: { error: {statusCode: 401, status: "failed", message: "authorization token expired please signin again"}}
+        500:
+          description: server errors
+          schema:
+            type: object
+            example: { error: {statusCode: 500, status: "failed", message: "internal server error"}}
+
+
+#Defining Body Reference
+  /create:
+    post:
+      summary: Adds a new user
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          schema:
+           $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: OK
+
+
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - name
+        - id
+      properties:
+        names:
+          type: string
+          required: true
+        email:
+          type: string
+          required: true
+        country:
+          type: string
+          required: true
+        password:
+          type: string
+          required: true
+    Podcast:
+      type: object
+      example: {cover: "https://yocast-api.nextreflexe.com/images/background/yocast.jpeg", likes: 0, views: 0, isFree: false, id: 5, owner: "admin@gmail.com", name: "BEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI", "description": "BEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI", price": 700, category: "Business, Education, Technology", url: "https://yocast-api.nextreflexe.com/videos/podcasts/2021-08-26T11:11:45.357ZBEST OF MOSSAD 15-18- HACIYE UWAMBAYE MU BITERO BYO GUHITANA ABATEGETSI.mp4", updatedAt: "2021-08-26T11:11:47.003Z", createdAt: "2021-08-26T11:11:47.003Z"}

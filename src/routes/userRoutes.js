@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-const { index, 
+const { 
         signupCont, 
         signinCont, 
         podcasts,
@@ -16,9 +16,6 @@ const { index,
     } = require('../controller/appController')
 
 router
-
-    .get('/', index)
-
     .post('/signup', signupCont)
 
     .post('/signin', signinCont)

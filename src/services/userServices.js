@@ -149,7 +149,7 @@ const like = async(podcastId)=>{
  * @requires (email, type)
  * @returns (message, substription details)
  */
-const paysubscription = async(email, type)=>{
+const paysubscription = async(email, transactionId, paymentMode, type, price, currency)=>{
     try {
 
         let desactivationDate = new Date();
@@ -167,6 +167,10 @@ const paysubscription = async(email, type)=>{
             ...{
                 owner: email,
                 type,
+                transactionId,
+                paymentMode,
+                price,
+                currency,
                 desactivationDate
             }
         }).dataValues
