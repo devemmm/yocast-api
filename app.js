@@ -21,7 +21,7 @@ app.use(express.static(publicDirectoryPath))
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
-app.use('/', swaggerUI.serve, swaggerUI.setup(swaggerJsDocs))
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJsDocs))
 app.use(adminRouter)
 app.use(userRouter)
 
