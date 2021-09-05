@@ -43,7 +43,7 @@ const findAllPodcast = async()=>{
 
     try {
         // const podcast = await Podcast.findAll(); 
-        const podcasts = await db.query(`SELECT Podcasts.id, Podcasts.owner, Users.names as ownerName, Podcasts.name, Podcasts.url, Podcasts.cover, Podcasts.category, Podcasts.description, Podcasts.price, Podcasts.likes, Podcasts.views, Podcasts.isFree, Podcasts.createdAt, Podcasts.updatedAt FROM Users RIGHT JOIN Podcasts ON Users.email = Podcasts.owner ORDER BY Podcasts.createdAt DESC LIMIT 10;`, QueryTypes.SELECT);
+        const podcasts = await db.query(`SELECT Podcasts.id, Podcasts.owner, Users.names as ownerName, Podcasts.name, Podcasts.url, Podcasts.cover, Podcasts.category, Podcasts.description, Podcasts.price, Podcasts.likes, Podcasts.views, Podcasts.isFree, Podcasts.createdAt, Podcasts.updatedAt FROM Users RIGHT JOIN Podcasts ON Users.email = Podcasts.owner ORDER BY Podcasts.createdAt DESC LIMIT 40;`, QueryTypes.SELECT);
         return podcasts[0]
     } catch (error) {
         throw new Error(error.message)
