@@ -42,8 +42,9 @@ const create = async(data, type)=>{
 const findAllPodcast = async()=>{
 
     try {
-        const podcast = await Podcast.findAll();
-        return podcast
+        // const podcast = await Podcast.findAll(); 
+        const podcasts = await db.query(`SELECT Podcasts.id, Podcasts.owner, Users.names as ownerName, Podcasts.name, Podcasts.url, Podcasts.cover, Podcasts.category, Podcasts.description, Podcasts.price, Podcasts.likes, Podcasts.views, Podcasts.isFree, Podcasts.createdAt, Podcasts.updatedAt FROM Users RIGHT JOIN Podcasts ON Users.email = Podcasts.owner ORDER BY Podcasts.createdAt DESC LIMIT 10;`, QueryTypes.SELECT);
+        return podcasts[0]
     } catch (error) {
         throw new Error(error.message)
     }
@@ -146,15 +147,22 @@ const findSubscriptions = async(email)=>{
 
 const filterBy = async(type)=>{
     try {
+        let podcasts = null;
         switch(type){
             case 'recent':
-                return await Podcast.findAll({limit: 10, order: [['updatedAt', 'DESC']]})
+                // return await Podcast.findAll({limit: 10, order: [['updatedAt', 'DESC']]})
+                podcasts = await db.query('SELECT Podcasts.id, Podcasts.owner, Users.names as ownerName, Podcasts.name, Podcasts.url, Podcasts.cover, Podcasts.category, Podcasts.description, Podcasts.price, Podcasts.likes, Podcasts.views, Podcasts.isFree, Podcasts.createdAt, Podcasts.updatedAt FROM Users RIGHT JOIN Podcasts ON Users.email = Podcasts.owner ORDER BY Podcasts.updatedAt DESC LIMIT 10;', QueryTypes.SELECT)
+                return podcasts[0]
             case 'popular':
-                return await Podcast.findAll({limit: 10, order:[['views', 'DESC']]})
+                // return await Podcast.findAll({limit: 10, order:[['views', 'DESC']]})
+                podcasts = await db.query('SELECT Podcasts.id, Podcasts.owner, Users.names as ownerName, Podcasts.name, Podcasts.url, Podcasts.cover, Podcasts.category, Podcasts.description, Podcasts.price, Podcasts.likes, Podcasts.views, Podcasts.isFree, Podcasts.createdAt, Podcasts.updatedAt FROM Users RIGHT JOIN Podcasts ON Users.email = Podcasts.owner ORDER BY Podcasts.views DESC LIMIT 10;', QueryTypes.SELECT)
+                return podcasts[0]
             case 'price':
-                return await Podcast.findAll({limit: 10, order:[['price', 'DESC']]})
+                // return await Podcast.findAll({limit: 10, order:[['price', 'DESC']]})
+                podcasts = await db.query('SELECT Podcasts.id, Podcasts.owner, Users.names as ownerName, Podcasts.name, Podcasts.url, Podcasts.cover, Podcasts.category, Podcasts.description, Podcasts.price, Podcasts.likes, Podcasts.views, Podcasts.isFree, Podcasts.createdAt, Podcasts.updatedAt FROM Users RIGHT JOIN Podcasts ON Users.email = Podcasts.owner ORDER BY Podcasts.price DESC LIMIT 10;', QueryTypes.SELECT)
+                return podcasts[0]            
             default:
-                let podcasts = await db.query(`SELECT * FROM Podcasts WHERE category LIKE "%${type}%" ORDER BY createdAt DESC`,  QueryTypes.SELECT)
+                podcasts = await db.query(`SELECT * FROM Podcasts WHERE category LIKE "%${type}%" ORDER BY createdAt DESC`,  QueryTypes.SELECT)
                 
                 return podcasts[0]
         }

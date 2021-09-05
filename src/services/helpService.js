@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 const { create, findByPk  } = require('../dataAcessObject/appDao')
 const Token = require('../models/Token')
 
-const generateToken = async(email)=> {
+const generateToken = async(email, names)=> {
 
     const tokenKey = jwt.sign({ email }, process.env.JWT_SECRET)
 
@@ -11,7 +11,8 @@ const generateToken = async(email)=> {
         const token = new Token({
             ...{
                 owner: email,
-                token: tokenKey
+                token: tokenKey,
+                names
             }
         }).dataValues
 

@@ -57,7 +57,7 @@ const signup = async(userDetails)=>{
         }
 
         await create(user, 'user');
-        const token = await generateToken(email)
+        const token = await generateToken(email, names)
         user.token = token
         return user
     } catch (error) {
@@ -73,7 +73,7 @@ const signup = async(userDetails)=>{
 const signin = async(email, password)=>{
     try {
         const user = await findByCredentials(email, password)
-        const token = await generateToken(email)
+        const token = await generateToken(email, user.names)
 
         user.token = token
         return user
