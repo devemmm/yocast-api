@@ -2,6 +2,7 @@ const multer = require('multer')
 const { requireAuth } = require('../middleware/requireAuth')
 const { signup, 
         signin,
+        getUserDetails,
         view,
         like,
         getAllPodcast,
@@ -54,7 +55,7 @@ const podcastMedia = multer({
         fieldSize: 2000000
     },
     fileFilter(req, file, cb) {
-        if (!file.originalname.match(/\.(MP4)$/)) {
+        if (!file.originalname.match(/\.(MP4|mp4)$/)) {
             return cb(new Error('Please upload an mp4 media'))
         }
 
@@ -130,6 +131,18 @@ const createPodcastCont = [
         }
     },(error, req, res, next) => {
         res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
+    }
+]
+
+const getAccountInfoCont = [
+    requireAuth, async(req, res)=>{
+        try {
+            const user = await getUserDetails(req.user.email)
+            
+            res.status(200).json({ statusCode: 200, status: "sucessfull", message: "user details", user})
+        } catch (error) {
+            res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
+        }
     }
 ]
 
@@ -366,6 +379,7 @@ module.exports = {
     filterPodcastCont,
     paysubscriptionCont,
     findSubscriptionCont,
+    getAccountInfoCont,
     updateAccountCont,
     updatePodcastCont,
     deletePodcastCont,

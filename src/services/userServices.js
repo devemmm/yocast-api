@@ -82,6 +82,25 @@ const signin = async(email, password)=>{
     }
 }
 
+
+/**
+ * @description get user(account) details
+ * @requires authorisaztion
+ * @returns object
+ */
+
+const getUserDetails = async(email)=>{
+    try {
+        if(!email){
+            throw new Error("email must be required")
+        }
+        return await findByPk(email, 'user')
+    } catch (error) {
+        throw new Error(error.message)
+    }
+}
+
+
 /**
  * @description find all podcasr podcast)
  * @requires authorisaztion
@@ -251,6 +270,7 @@ const signout = async(token, kind)=>{
 module.exports = {
     signup,
     signin,
+    getUserDetails,
     getAllPodcast,
     view,
     like,

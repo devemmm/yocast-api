@@ -11,6 +11,7 @@ const {
         filterPodcastCont,
         paysubscriptionCont,
         findSubscriptionCont,
+        getAccountInfoCont,
         updateAccountCont,
         signOutCont
     } = require('../controller/appController')
@@ -31,6 +32,8 @@ router
     .post('/user/subscription', paysubscriptionCont)
 
     .get('/user/subscription', findSubscriptionCont)
+
+    .get('/user/account/me', getAccountInfoCont)
 
     .patch('/user/account', updateAccountCont)
 
