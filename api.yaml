@@ -401,6 +401,11 @@ paths:
         type: String
         required: true
         description: Autorization token example => "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNjI5OTEwMzg0fQ.UyrsGz7eXep4Co-kO3H3NlHv4yMDiz9KDRxYC0sHP_Z"
+      - in: formData
+          name: avatar
+          type: file
+          required: false
+          description: profile picture not required
       - in: body
         name: body
         required: true
