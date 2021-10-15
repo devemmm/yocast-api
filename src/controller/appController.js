@@ -55,7 +55,7 @@ const podcastMedia = multer({
         fieldSize: 2000000
     },
     fileFilter(req, file, cb) {
-        if (!file.originalname.match(/\.(MP4|mp4)$/)) {
+        if (!file.originalname.match(/\.(MP3|mp3)$/)) {
             return cb(new Error('Please upload an mp4 media'))
         }
 
@@ -104,6 +104,7 @@ const createPodcastCont = [
 
         const pod = req.body
         pod.owner = req.user.email
+        pod.owner_names = req.user.names
 
         try {
 

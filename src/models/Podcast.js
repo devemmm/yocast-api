@@ -13,6 +13,9 @@ const Podcast = db.define("Podcast", {
         type: Sequelize.STRING,
         references: { model: "Users", key: "email", onDelete: "CASCADE" }
     },
+    owner_names:{
+        type: Sequelize.STRING
+    },
     name: {
         type: Sequelize.STRING
     },

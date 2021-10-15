@@ -4,7 +4,7 @@ const { create, update,remove, findByPk } = require('../dataAcessObject/appDao')
 const createPodcast = async(pod)=>{
     try {
 
-        let { owner, name, description, price, category, url } = pod
+        let { owner, owner_names, name, description, price, category, url } = pod
 
         
         if(!name){
@@ -31,6 +31,7 @@ const createPodcast = async(pod)=>{
 
         const podcast = new Podcast({
             owner,
+            owner_names,
             name,
             description,
             price,

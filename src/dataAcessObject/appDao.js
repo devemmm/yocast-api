@@ -138,8 +138,9 @@ const remove = async(pk, type, kind)=>{
 }
 
 const findSubscriptions = async(email)=>{
+
     try {
-        return await Subscription.findAll({owner: email, limit: 100, order: [['updatedAt', 'DESC']]})
+        return await db.query(`SELECT * FROM Subscriptions WHERE owner="${email}" ORDER BY createdAt DESC LIMIT 40;`, QueryTypes.SELECT)
     } catch (error) {
         throw new Error(error.message)
     }
