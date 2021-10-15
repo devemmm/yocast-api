@@ -1,6 +1,6 @@
 const multer = require('multer')
 const { requireAuth } = require('../middleware/requireAuth')
-const { signup, 
+const { signup,
         signin,
         getUserDetails,
         view,
@@ -10,7 +10,7 @@ const { signup,
         paysubscription,
         findSubscription,
         updateAccount,
-        signout 
+        signout
     } = require('../services/userServices')
 
 const { createPodcast, deletePodcast,updatePodcast } = require('../services/adminService')
@@ -91,8 +91,8 @@ const signupCont = [
             const user = await signup({
                 ...req.body
             })
-    
-            res.status(200).json({ statusCode: 201, message: 'account created successfull', status: 'successfull', user })                                                 
+
+            res.status(200).json({ statusCode: 201, message: 'account created successfull', status: 'successfull', user })
         } catch (error) {
             res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
         }
@@ -101,7 +101,7 @@ const signupCont = [
 
 const createPodcastCont = [
     requireAuth, podcastMedia.single("podcast"),async(req, res)=>{
-        
+
         const pod = req.body
         pod.owner = req.user.email
 
@@ -138,7 +138,7 @@ const getAccountInfoCont = [
     requireAuth, async(req, res)=>{
         try {
             const user = await getUserDetails(req.user.email)
-            
+
             res.status(200).json({ statusCode: 200, status: "sucessfull", message: "user details", user})
         } catch (error) {
             res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
@@ -157,7 +157,7 @@ const updatePodcastCont = [
             const allowedUpdates = ["name", "description", "category", "price"]
 
             const isValidUpdate = Object.keys(updates).every((update)=>allowedUpdates.includes(update))
-            
+
             if(!isValidUpdate){
                 throw new Error("internal server error it seems you have added undefined attributes for podcast or you want to modify unexpected attributes")
             }
@@ -187,7 +187,7 @@ const deletePodcastCont = [
             const id = parseInt(req.params.id)
 
             await deletePodcast(id)
-            res.status(200).json({ statusCode: 200, message: 'delete podcast successfull', status: 'successfull'})                                                 
+            res.status(200).json({ statusCode: 200, message: 'delete podcast successfull', status: 'successfull'})
         } catch (error) {
             res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
         }
@@ -202,7 +202,7 @@ const podcasts = [
             const podcast = await getAllPodcast()
 
             res.status(200).json({ statusCode: 200, status: "sucessfull", podcast})
-            
+
         } catch (error) {
             return res.status(500).json({ error: { statusCode: 500, status: "failed", message: error.message} })
         }
@@ -314,8 +314,8 @@ const updateAccountCont = [
             if(req.file){
                 updates.avatar = (req.file.path).replace('public', `${process.env.SITE_URL}`)
             }
-            
-            
+
+
             const allowedUpdates = ["names", "country", "phone", "avatar"]
             const isValidOperation = Object.keys(updates).every((update)=>allowedUpdates.includes(update))
 
@@ -339,7 +339,7 @@ const signOutCont = [
     requireAuth, async(req, res)=>{
         try {
             const { all } = req.query
-            
+
             let result = null
 
             if(!all){

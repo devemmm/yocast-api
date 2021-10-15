@@ -18,8 +18,8 @@ const requireAuth = (req, res, next)=>{
                 if(error){
                     throw new Error("authorization token is invalid")
                 }
-   
-                
+
+
 
                 const tokenData = await findByPk(token, "token")
 
@@ -28,16 +28,16 @@ const requireAuth = (req, res, next)=>{
                 }
 
                 const { owner } = tokenData.dataValues
-    
+
                 const user = await findByPk(owner, 'user')
-    
+
                 if(!user){
                     throw new Error('wrong token')
                 }
-    
+
                 const { _previousDataValues } = user
                 req.user = _previousDataValues
-                req.user.token = token                
+                req.user.token = token
                 next()
             } catch (error) {
                 res.status(401).json({ error: { statusCode: 401, status: "failed", message: error.message} })
