@@ -1,11 +1,15 @@
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const Subscription = require('../models/Subscription')
 const User = require('../models/User')
+
 
 const { 
         create,
         remove, 
         findByPk,
+        createOTP,
         findAllPodcast,
         update,
         filterBy,
@@ -58,7 +62,8 @@ const signup = async(userDetails)=>{
 
         await create(user, 'user');
         const token = await generateToken(email, names)
-        user.token = token
+        user.token = token;
+
         return user
     } catch (error) {
         throw new Error(error.message)
@@ -77,6 +82,54 @@ const signin = async(email, password)=>{
 
         user.token = token
         return user
+    } catch (error) {
+        throw new Error(error.message)
+    }
+}
+
+/**
+ * @description forgot password (account) details
+ * @requires authorisaztion
+ * @returns object
+ */
+
+const forgotPassword = async(email, phone)=>{
+    try {
+
+        const user = await findByPk(email, 'user');
+
+        if(!user){
+            throw new Error("email not found");
+        }
+
+        let OTP = Math.floor(Math.random() * 9999);
+        OTP < 1000 ? OTP = OTP + 1000  : OTP = OTP;
+
+        const secureOTP = jwt.sign({OTP, email}, process.env.JWT_SECRET, {expiresIn: '15min'});
+
+        const transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            service: process.env.EMAIL_SERVICE,
+            port: process.env.EMAIL_PORT,
+            secure: true,
+            auth:{
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD
+            }
+        });
+
+        await transporter.sendMail({
+            from: process.env.EMAIL,
+            to: email,
+            text: `YOCAST OTP CODE: ${OTP}`
+        });
+
+        const result = await createOTP({email, OTP: secureOTP, optType: 'otpCode'})
+        if(result.statusCode === 200){
+            return secureOTP;
+        }
+        
+        throw new Error("Something went wrong");
     } catch (error) {
         throw new Error(error.message)
     }
@@ -270,6 +323,7 @@ const signout = async(token, kind)=>{
 module.exports = {
     signup,
     signin,
+    forgotPassword,
     getUserDetails,
     getAllPodcast,
     view,

@@ -1,7 +1,11 @@
-const multer = require('multer')
+const User = require('../models/User');
+const multer = require('multer');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { requireAuth } = require('../middleware/requireAuth')
 const { signup,
         signin,
+        forgotPassword,
         getUserDetails,
         view,
         like,
@@ -93,6 +97,99 @@ const signupCont = [
             })
 
             res.status(200).json({ statusCode: 201, message: 'account created successfull', status: 'successfull', user })
+        } catch (error) {
+            res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
+        }
+    }
+]
+
+const forgotPasswordCont = [
+    async(req, res)=>{
+        try {
+            const { email } = req.body;
+
+            if(!email){
+                throw new Error("you must provide email address")
+            }
+
+            const OTP = await forgotPassword(email, '');
+
+            res.status(200).json({ statusCode: 200, message: 'check confirmation code your email', status: 'successfull', OTP})
+        } catch (error) {
+            res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
+        }
+    }
+]
+
+const verifyOTP = [
+    async(req, res)=>{
+        try {
+            const { email, type, otp } = req.params;
+
+            const userData = await User.findByPk(email);
+            const user =userData.dataValues;
+
+            if(!user){
+                throw new Error("user not found");
+            }
+
+            if(type === 'otpCode'){
+                jwt.verify(user.otpCode, process.env.JWT_SECRET, async(error, payload)=>{
+                    try {
+                        if(error){
+                            throw new Error("invalid OTP or it's expired")
+                        }
+                 
+                        if(parseInt(otp) !== payload.OTP){
+                            throw new Error("invalid OTP");
+                        }
+
+                        res.status(200).json({ statusCode: 200, message: 'valid OTP', status: 'successfull', OTP: payload.OTP})
+                    } catch (error) {
+                        return res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
+                    }
+                })
+            }else{
+                res.status(400).json({ error: { statusCode: 400, status: "failed", message: 'system under development'} })
+            }
+        } catch (error) {
+            res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
+        }
+    }
+]
+
+const resetPasswordCont = [
+    async(req, res)=>{
+        try {
+            const { email, password, OTP } = req.body;
+
+            const userData = await User.findByPk(email);
+            const user =userData.dataValues;
+
+            if(!user){
+                throw new Error("user not found");
+            }
+
+            jwt.verify(user.otpCode, process.env.JWT_SECRET, async(error, payload)=>{
+                try {
+                    if(error){
+                        throw new Error("invalid OTP or it's expired")
+                    }
+             
+                    if(parseInt(OTP) !== payload.OTP){
+                        throw new Error("invalid OTP");
+                    }
+
+                    userData.password = await bcrypt.hash(password, 8);
+
+                    await userData.save();
+
+                    res.status(200).json({ statusCode: 200, message: 'Password was Resetted successfully', status: 'successfull'})
+                } catch (error) {
+                    return res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
+                }
+            });
+
         } catch (error) {
             res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message} })
         }
@@ -372,6 +469,9 @@ const notFound = [
 module.exports = {
     signinCont,
     signupCont,
+    forgotPasswordCont,
+    verifyOTP,
+    resetPasswordCont,
     podcasts,
     createPodcastCont,
     notFound,

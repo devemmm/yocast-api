@@ -4,6 +4,9 @@ const router = express.Router()
 const {
         signupCont,
         signinCont,
+        forgotPasswordCont,
+        verifyOTP,
+        resetPasswordCont,
         podcasts,
         listernPodcast,
         likePodcast,
@@ -20,6 +23,12 @@ router
     .post('/signup', signupCont)
 
     .post('/signin', signinCont)
+
+    .post('/users/forgotpassword', forgotPasswordCont)
+
+    .get('/users/check/otp/:email/:type/:otp', verifyOTP)
+
+    .post('/users/reset/password', resetPasswordCont)
 
     .post('/user/listern', listernPodcast)
 

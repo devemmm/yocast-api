@@ -32,6 +32,14 @@ const User = db.define("User", {
     password: {
         type: Sequelize.STRING
     },
+    otpCode:{
+        type: Sequelize.STRING,
+        defaultValue: null
+    },
+    otpLink:{
+        type: Sequelize.STRING,
+        defaultValue: null
+    },
     createdAt: Sequelize.DATE,
     updatedAt: Sequelize.DATE
 })

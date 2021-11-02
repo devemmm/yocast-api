@@ -106,6 +106,26 @@ const update = async(data, type)=>{
     }
 }
 
+const createOTP = async({email, OTP, optType})=>{
+    try {
+        if(optType === "otpCode"){
+            const user = await User.findByPk(email);
+            user.otpCode = OTP;
+            await user.save();
+    
+            return {statusCode: 200}
+        }else{
+            const user = await User.findByPk(email);
+            user.otpLink = OTP;
+            await user.save();
+    
+            return {statusCode: 200}
+        }
+    } catch (error) {
+        return {statusCode: 400};
+    }
+}
+
 const remove = async(pk, type, kind)=>{
     try {
         switch(type){
@@ -175,6 +195,7 @@ const filterBy = async(type)=>{
 module.exports = {
     create,
     findAllPodcast,
+    createOTP,
     findSubscriptions,
     findByPk,
     update,
