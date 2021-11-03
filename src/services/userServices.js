@@ -121,7 +121,8 @@ const forgotPassword = async(email, phone)=>{
         await transporter.sendMail({
             from: process.env.EMAIL,
             to: email,
-            text: `YOCAST OTP CODE: ${OTP}`
+            subject: `Yocast verfication OTP code: ${OTP}`,
+            text: 'this OTM will be expired in 10 min'
         });
 
         const result = await createOTP({email, OTP: secureOTP, optType: 'otpCode'})
