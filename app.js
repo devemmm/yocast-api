@@ -1,3 +1,4 @@
+require('dotenv-flow').config();
 require('./src/database/dbConfig')
 const path = require('path')
 const express = require('express')
@@ -25,4 +26,5 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJsDocs))
 app.use(adminRouter)
 app.use(userRouter)
 
-app.listen(port, ()=> console.log(`server is running on port ${port}`))
+
+module.exports = app;
