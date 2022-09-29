@@ -4,7 +4,7 @@
   "description": "this is a podcast called \"yocast\"",
   "main": "./src/app.js",
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "cross-env NODE_ENV=production node ./bin/www",
     "dev": "cross-env NODE_ENV=development nodemon ./bin/www",
     "prod": "cross-env NODE_ENV=production node ./bin/www"
   },
