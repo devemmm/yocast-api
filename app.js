@@ -26,5 +26,4 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJsDocs))
 app.use(adminRouter)
 app.use(userRouter)
 
-
-module.exports = app;
+app.listen(port, ()=>console.log(`Server is running on port ${port}`))
