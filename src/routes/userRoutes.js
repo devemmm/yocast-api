@@ -9,6 +9,7 @@ const {
         resetPasswordCont,
         podcasts,
         listernPodcast,
+        sendMessage,
         likePodcast,
         notFound,
         filterPodcastCont,
@@ -29,6 +30,8 @@ router
     .get('/users/check/otp/:email/:type/:otp', verifyOTP)
 
     .post('/users/reset/password', resetPasswordCont)
+
+    .post('/users/sendmessage', sendMessage)
 
     .post('/user/listern', listernPodcast)
 

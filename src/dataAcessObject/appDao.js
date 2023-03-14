@@ -50,6 +50,15 @@ const findAllPodcast = async()=>{
     }
 }
 
+const findAllUsers = async()=>{
+    try {
+        const users = await User.findAll();
+        return users
+    } catch (error) {
+        throw new Error(error.message)
+    }
+}
+
 const findByPk = async(pk, type)=>{
     try {
         switch(type){
@@ -157,10 +166,14 @@ const remove = async(pk, type, kind)=>{
     }
 }
 
-const findSubscriptions = async(email)=>{
+const findSubscriptions = async({email, type})=>{
 
     try {
-        return await db.query(`SELECT * FROM Subscriptions WHERE owner="${email}" ORDER BY createdAt DESC LIMIT 40;`, QueryTypes.SELECT)
+        if(type= "all"){
+            return await db.query(`SELECT * FROM Subscriptions ORDER BY createdAt DESC;`, QueryTypes.SELECT)
+        }else{
+            return await db.query(`SELECT * FROM Subscriptions WHERE owner="${email}" ORDER BY createdAt DESC LIMIT 40;`, QueryTypes.SELECT)
+        }
     } catch (error) {
         throw new Error(error.message)
     }
@@ -195,6 +208,7 @@ const filterBy = async(type)=>{
 module.exports = {
     create,
     findAllPodcast,
+    findAllUsers,
     createOTP,
     findSubscriptions,
     findByPk,

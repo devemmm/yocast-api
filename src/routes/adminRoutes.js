@@ -1,5 +1,7 @@
 const { 
-        createPodcastCont, 
+        createPodcastCont,
+        getAllUserSubscription, 
+        getAllUsers,
         updatePodcastCont, 
         deletePodcastCont 
     } = require('../controller/appController')
@@ -9,6 +11,10 @@ const router = express()
 
 router
     .post('/admin/podcast', createPodcastCont)
+
+    .get('/admin/subscription', getAllUserSubscription)
+
+    .get('/admin/users', getAllUsers)
 
     .patch('/admin/podcast/:id', updatePodcastCont)
 

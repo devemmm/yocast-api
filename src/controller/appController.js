@@ -10,6 +10,7 @@ const { signup,
     view,
     like,
     getAllPodcast,
+    sendMail,
     filterPodcast,
     paysubscription,
     findSubscription,
@@ -212,6 +213,21 @@ const resetPasswordCont = [
     }
 ]
 
+const sendMessage = [
+     async (req, res) => {
+        try {
+            const { names, email, phone,message } = req.body;
+            if(!names && !email && !phone && !message){
+                throw new Error("both names, email, phone are required");
+            }
+            await sendMail({ names, email, phone, message })
+            res.status(200).send({statusCode: 200, message: 'you message sent successfull, you will get the response soon.'})
+        } catch (error) {
+            res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message } })
+        }
+    }
+]
+
 const podcastst = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './public/podcasts')
@@ -261,10 +277,41 @@ const createPodcastCont = [
     }
 ]
 
+const getAllUserSubscription = [
+    requireAuth, async (req, res) => {
+        try {
+            const { email, type} = req.user
+            if(type && type!= "admin"){
+                throw new Error("you are not allowed to use this route")
+            }
+            const subscription = await findSubscription(email, 'all')
+            return res.status(200).json({ statusCode: 200, status: 'successfull', message: 'yocast subscription', subscription })
+        } catch (error) {
+            return res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message } })
+        }
+    }
+]
+
+const getAllUsers = [
+    requireAuth, async (req, res) => {
+        try {
+            const { type } = req.user
+            if(type && type!= "admin"){
+                throw new Error("you are not allowed to use this route")
+            }
+            const user = await getUserDetails({email: req.user.email, type: 'all'})
+
+            res.status(200).json({ statusCode: 200, status: "sucessfull", message: "Yocast users", user })
+        } catch (error) {
+            res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message } })
+        }
+    }
+]
+
 const getAccountInfoCont = [
     requireAuth, async (req, res) => {
         try {
-            const user = await getUserDetails(req.user.email)
+            const user = await getUserDetails({email: req.user.email})
 
             res.status(200).json({ statusCode: 200, status: "sucessfull", message: "user details", user })
         } catch (error) {
@@ -503,12 +550,15 @@ module.exports = {
     resetPasswordCont,
     podcasts,
     createPodcastCont,
+    sendMessage,
     notFound,
     listernPodcast,
     likePodcast,
     filterPodcastCont,
     paysubscriptionCont,
     findSubscriptionCont,
+    getAllUserSubscription,
+    getAllUsers,
     getAccountInfoCont,
     updateAccountCont,
     updatePodcastCont,

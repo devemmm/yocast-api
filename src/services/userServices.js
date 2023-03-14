@@ -5,22 +5,23 @@ const Subscription = require('../models/Subscription')
 const User = require('../models/User')
 
 
-const { 
-        create,
-        remove, 
-        findByPk,
-        createOTP,
-        findAllPodcast,
-        update,
-        filterBy,
-        findSubscriptions,
-    } = require('../dataAcessObject/appDao')
-    
-const { 
-        generateToken, 
-        isExistUser,
-        findByCredentials 
-    } = require('./helpService')
+const {
+    create,
+    remove,
+    findByPk,
+    findAllUsers,
+    createOTP,
+    findAllPodcast,
+    update,
+    filterBy,
+    findSubscriptions,
+} = require('../dataAcessObject/appDao')
+
+const {
+    generateToken,
+    isExistUser,
+    findByCredentials
+} = require('./helpService')
 
 
 /**
@@ -28,22 +29,22 @@ const {
  * @param { object } user
  * @returns string "successfull message"
  */
-const signup = async(userDetails)=>{
+const signup = async (userDetails) => {
     try {
         const { email, names, country, password } = userDetails
-        if(!email){
+        if (!email) {
             throw new Error("email required")
         }
 
-        if(!names){
+        if (!names) {
             throw new Error("names required")
         }
 
-        if(!country){
+        if (!country) {
             throw new Error("country required")
         }
 
-        if(!password){
+        if (!password) {
             throw new Error("password required")
         }
 
@@ -56,7 +57,7 @@ const signup = async(userDetails)=>{
             }
         }).dataValues
 
-        if(await isExistUser(email)){
+        if (await isExistUser(email)) {
             throw new Error("user alredy exist")
         }
 
@@ -75,7 +76,7 @@ const signup = async(userDetails)=>{
  * @param { email, password }
  * @returns {object } user details
  */
-const signin = async(email, password)=>{
+const signin = async (email, password) => {
     try {
         const user = await findByCredentials(email, password)
         const token = await generateToken(email, user.names)
@@ -87,32 +88,68 @@ const signin = async(email, password)=>{
     }
 }
 
+
+
+const sendMail = async ({ names, email, phone, message }) => {
+    const output = `
+            <p>Yocast - Client Message</p>
+            <h3>Client Details</h3>
+            <ul>
+                <li>Name: ${names}</li>
+                <li>Email: ${email}</li>
+                <li>Phone: ${phone}</li>
+            </ul>
+            <h3>Message</h3>
+            <p>${message}</p>
+        `;
+
+
+    const transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        service: process.env.EMAIL_SERVICE,
+        port: process.env.EMAIL_PORT,
+        secure: true,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD
+        }
+    });
+
+    await transporter.sendMail({
+        from: process.env.EMAIL,
+        to: process.env.TECHNICAL_SUPPORT_MAILS,
+        subject: "Yocast Ltd Custom Message",
+        text: "heading",
+        html: output
+    });
+}
+
 /**
  * @description forgot password (account) details
  * @requires authorisaztion
  * @returns object
  */
 
-const forgotPassword = async(email, phone)=>{
+const forgotPassword = async (email, phone) => {
     try {
 
         const user = await findByPk(email, 'user');
 
-        if(!user){
+        if (!user) {
             throw new Error("email not found");
         }
 
         let OTP = Math.floor(Math.random() * 9999);
-        OTP < 1000 ? OTP = OTP + 1000  : OTP = OTP;
+        OTP < 1000 ? OTP = OTP + 1000 : OTP = OTP;
 
-        const secureOTP = jwt.sign({OTP, email}, process.env.JWT_SECRET, {expiresIn: '15min'});
+        const secureOTP = jwt.sign({ OTP, email }, process.env.JWT_SECRET, { expiresIn: '15min' });
 
         const transporter = nodemailer.createTransport({
             host: process.env.EMAIL_HOST,
             service: process.env.EMAIL_SERVICE,
             port: process.env.EMAIL_PORT,
             secure: true,
-            auth:{
+            auth: {
                 user: process.env.EMAIL,
                 pass: process.env.PASSWORD
             }
@@ -125,11 +162,11 @@ const forgotPassword = async(email, phone)=>{
             text: 'this OTM will be expired in 10 min'
         });
 
-        const result = await createOTP({email, OTP: secureOTP, optType: 'otpCode'})
-        if(result.statusCode === 200){
+        const result = await createOTP({ email, OTP: secureOTP, optType: 'otpCode' })
+        if (result.statusCode === 200) {
             return secureOTP;
         }
-        
+
         throw new Error("Something went wrong");
     } catch (error) {
         throw new Error(error.message)
@@ -143,10 +180,14 @@ const forgotPassword = async(email, phone)=>{
  * @returns object
  */
 
-const getUserDetails = async(email)=>{
+const getUserDetails = async ({ email, type }) => {
     try {
-        if(!email){
+
+        if (!email && !type) {
             throw new Error("email must be required")
+        }
+        if (type === "all") {
+            return await findAllUsers();
         }
         return await findByPk(email, 'user')
     } catch (error) {
@@ -160,7 +201,7 @@ const getUserDetails = async(email)=>{
  * @requires authorisaztion
  * @returns { array list } podcast
  */
-const getAllPodcast = async()=>{
+const getAllPodcast = async () => {
     const podcasts = await findAllPodcast()
     return podcasts
 }
@@ -172,7 +213,7 @@ const getAllPodcast = async()=>{
  * @requires (query string with type)
  * @returns (podcasts)
  */
-const filterPodcast = async(type)=>{
+const filterPodcast = async (type) => {
     try {
         return await filterBy(type);
     } catch (error) {
@@ -185,10 +226,10 @@ const filterPodcast = async(type)=>{
  * @requires podcast id
  * @returns { object } podcast
  */
-const view = async(podcastId)=>{
+const view = async (podcastId) => {
     try {
 
-        if(!podcastId){
+        if (!podcastId) {
             throw new Error("podcast id must be required")
         }
 
@@ -204,10 +245,10 @@ const view = async(podcastId)=>{
  * @returns { object } podcast
  */
 
-const like = async(podcastId)=>{
+const like = async (podcastId) => {
     try {
 
-        if(!podcastId){
+        if (!podcastId) {
             throw new Error("podcast id must be required")
         }
 
@@ -222,12 +263,12 @@ const like = async(podcastId)=>{
  * @requires (email, type)
  * @returns (message, substription details)
  */
-const paysubscription = async(email, transactionId, paymentMode, type, price, currency)=>{
+const paysubscription = async (email, transactionId, paymentMode, type, price, currency) => {
     try {
 
         let desactivationDate = new Date();
 
-        switch(type){
+        switch (type) {
             case 'monthly':
                 desactivationDate.setDate(new Date().getDate() + 30);
                 break
@@ -260,22 +301,26 @@ const paysubscription = async(email, transactionId, paymentMode, type, price, cu
  * @requires(email, type)
  * @returns(subsription details)
  */
-const findSubscription = async(email, type)=>{
+const findSubscription = async (email, type) => {
     try {
 
-        if(!email || !type){
+        if (!email || !type) {
             throw new Error("missing required parameters")
         }
-        switch(type){
+        let subscriptions = []
+        switch (type) {
             case 'history':
-                return await findSubscriptions(email)
+                return await findSubscriptions({ email })
             case 'last':
-                const subscriptions = await findSubscriptions(email)
+                subscriptions = await findSubscriptions({ email })
                 return subscriptions[0]
+            case 'all':
+                subscriptions = await findSubscriptions({ type: 'all' })
+                return subscriptions[0];
             default:
                 return [];
         }
-        
+
     } catch (error) {
         throw new Error(error.message)
     }
@@ -287,13 +332,13 @@ const findSubscription = async(email, type)=>{
  * @returns (account)
  */
 
-const updateAccount = async(updates)=>{
+const updateAccount = async (updates) => {
     try {
 
-        const allowedUpdates = ["email","names", "country", "phone", "avatar"]
-        const isValidOperation = Object.keys(updates).every((update)=>allowedUpdates.includes(update))
+        const allowedUpdates = ["email", "names", "country", "phone", "avatar"]
+        const isValidOperation = Object.keys(updates).every((update) => allowedUpdates.includes(update))
 
-        if(!isValidOperation){
+        if (!isValidOperation) {
             throw new Error("internal server error it seems you have added undefined attributes for user or you want to modify unexpected attributes")
         }
         const account = await findByPk(updates.email, 'user')
@@ -309,9 +354,9 @@ const updateAccount = async(updates)=>{
     }
 }
 
-const signout = async(token, kind)=>{
+const signout = async (token, kind) => {
     try {
-        if(!kind){
+        if (!kind) {
             return await remove(token, 'token')
         }
 
@@ -327,6 +372,7 @@ module.exports = {
     forgotPassword,
     getUserDetails,
     getAllPodcast,
+    sendMail,
     view,
     like,
     filterPodcast,
