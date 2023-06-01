@@ -2,6 +2,8 @@ const User = require('../models/User');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
+
 const { requireAuth } = require('../middleware/requireAuth')
 const { signup,
     signin,
@@ -14,9 +16,11 @@ const { signup,
     filterPodcast,
     paysubscription,
     findSubscription,
+    handleMomoCallBack,
     updateAccount,
     signout
 } = require('../services/userServices')
+const { generateUUID } = require('../services/helpService')
 
 const { createPodcast, deletePodcast, updatePodcast } = require('../services/adminService')
 
@@ -214,14 +218,14 @@ const resetPasswordCont = [
 ]
 
 const sendMessage = [
-     async (req, res) => {
+    async (req, res) => {
         try {
-            const { names, email, phone,message } = req.body;
-            if(!names && !email && !phone && !message){
+            const { names, email, phone, message } = req.body;
+            if (!names && !email && !phone && !message) {
                 throw new Error("both names, email, phone are required");
             }
             await sendMail({ names, email, phone, message })
-            res.status(200).send({statusCode: 200, message: 'you message sent successfull, you will get the response soon.'})
+            res.status(200).send({ statusCode: 200, message: 'you message sent successfull, you will get the response soon.' })
         } catch (error) {
             res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message } })
         }
@@ -237,9 +241,9 @@ const podcastst = multer.diskStorage({
     }
 })
 
-var uploadd = multer({storage: podcastst});
+var uploadd = multer({ storage: podcastst });
 
-const multipleUpload = uploadd.fields([{name: 'podcast', maxCount: 1}, {name: 'cover', maxCount: 1}])
+const multipleUpload = uploadd.fields([{ name: 'podcast', maxCount: 1 }, { name: 'cover', maxCount: 1 }])
 
 const createPodcastCont = [
     requireAuth, multipleUpload, async (req, res) => {
@@ -280,8 +284,8 @@ const createPodcastCont = [
 const getAllUserSubscription = [
     requireAuth, async (req, res) => {
         try {
-            const { email, type} = req.user
-            if(type && type!= "admin"){
+            const { email, type } = req.user
+            if (type && type != "admin") {
                 throw new Error("you are not allowed to use this route")
             }
             const subscription = await findSubscription(email, 'all')
@@ -296,10 +300,10 @@ const getAllUsers = [
     requireAuth, async (req, res) => {
         try {
             const { type } = req.user
-            if(type && type!= "admin"){
+            if (type && type != "admin") {
                 throw new Error("you are not allowed to use this route")
             }
-            const user = await getUserDetails({email: req.user.email, type: 'all'})
+            const user = await getUserDetails({ email: req.user.email, type: 'all' })
 
             res.status(200).json({ statusCode: 200, status: "sucessfull", message: "Yocast users", user })
         } catch (error) {
@@ -311,7 +315,7 @@ const getAllUsers = [
 const getAccountInfoCont = [
     requireAuth, async (req, res) => {
         try {
-            const user = await getUserDetails({email: req.user.email})
+            const user = await getUserDetails({ email: req.user.email })
 
             res.status(200).json({ statusCode: 200, status: "sucessfull", message: "user details", user })
         } catch (error) {
@@ -443,23 +447,66 @@ const filterPodcastCont = [
     }
 ]
 
+
+const responseMomoCont = [
+    async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { amount, status } = req.body;
+            const subscription = await handleMomoCallBack({ transactionId: id, price: amount, status });
+            if (subscription) {
+                res.status(200).send({ message: 'you have successfull paid the subscription', subscription })
+            }
+        } catch (error) {
+            return res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message } })
+
+        }
+    }
+]
+
 const paysubscriptionCont = [
     requireAuth, async (req, res) => {
         try {
             const { email } = req.user
-            const { transactionId, paymentMode, type, price, currency } = req.body
+            var { transactionId, paymentMode, type, price, currency, amount, phone_number } = req.body
+
+            let trid = (`${generateUUID(8)}-${generateUUID(4)}-${new Date().toISOString()}-${generateUUID(12)}`).replace(/\:/g, 'y')
+
+            if (amount && phone_number) {
+                if (!amount) {
+                    throw new Error('amount required!')
+                }
+
+                if (phone_number.length !== 10) {
+                    throw new Error('phone number is wrong')
+                }
+
+                if (phone_number && phone_number.length === 10) {
+                    phone_number = phone_number.replace(/.{1}/, '250');
+                }
+
+                const momoResponse = await axios.post('https://geniussoftware.rw/api/payment', {
+                    amount, api_key: process.env.MOMO_API_KEY, api_secret: process.env.MOMO_API_SECRET, phone_number, callback: `${process.env.YOCAST_PAYMENT_CALLBACK_URL}/${trid}`
+                })
+
+                if (momoResponse.data) {
+                    await paysubscription(email, trid, "mobile money", type, amount, 'PENDING', 'RWF')
+                    return res.status(200).send({ 'message': 'ok', data: momoResponse.data })
+                }
+            }
 
             if (!transactionId || !paymentMode || !type || !price || !currency) {
                 throw new Error("missing required information")
             }
 
-            const subscription = await paysubscription(email, transactionId, paymentMode, type, price, currency)
+            const subscription = await paysubscription(email, transactionId, paymentMode, type, price, 'SUCCESS', currency)
             return res.status(200).json({ statusCode: 200, status: 'successfull', message: 'buy subscription sucessfull', subscription })
         } catch (error) {
             return res.status(400).json({ error: { statusCode: 400, status: "failed", message: error.message } })
         }
     }
 ]
+
 
 const findSubscriptionCont = [
     requireAuth, async (req, res) => {
@@ -556,6 +603,7 @@ module.exports = {
     likePodcast,
     filterPodcastCont,
     paysubscriptionCont,
+    responseMomoCont,
     findSubscriptionCont,
     getAllUserSubscription,
     getAllUsers,

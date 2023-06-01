@@ -13,6 +13,7 @@ const {
         likePodcast,
         notFound,
         filterPodcastCont,
+        responseMomoCont,
         paysubscriptionCont,
         findSubscriptionCont,
         getAccountInfoCont,
@@ -40,6 +41,8 @@ router
     .get('/user/podcast', filterPodcastCont)
 
     .get('/podcasts', podcasts)
+
+    .post('/user/subscription/:id', responseMomoCont)
 
     .post('/user/subscription', paysubscriptionCont)
 

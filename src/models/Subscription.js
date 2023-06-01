@@ -16,6 +16,10 @@ const Subscription = db.define("Subscription", {
     transactionId:{
         type: Sequelize.STRING
     },
+    paymentStatus:{
+        type: Sequelize.ENUM("PENDING", "SUCCESS", "FAILED"),
+        default: 'PENDING'
+    },
     paymentMode:{
         type: Sequelize.STRING
     },
@@ -26,7 +30,8 @@ const Subscription = db.define("Subscription", {
         type: Sequelize.INTEGER
     },
     currency:{
-        type: Sequelize.STRING
+        type: Sequelize.ENUM("RWF", "USD", "EUR", "AOA", "DZD"),
+        default: 'RWF'
     },
     desactivationDate: Sequelize.DATE,
     createdAt: Sequelize.DATE,

@@ -22,6 +22,20 @@ const generateToken = async(email, names)=> {
     }
 }
 
+
+const generateUUID = (length)=>{
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+}
+
 const isExistUser = async(email)=>{
     try {
         if(!email){
@@ -65,6 +79,7 @@ const findByCredentials = async(email, password)=>{
 
 module.exports = {
     generateToken,
+    generateUUID,
     isExistUser,
     findByCredentials,
 } 

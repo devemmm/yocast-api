@@ -263,7 +263,7 @@ const like = async (podcastId) => {
  * @requires (email, type)
  * @returns (message, substription details)
  */
-const paysubscription = async (email, transactionId, paymentMode, type, price, currency) => {
+const paysubscription = async (email, transactionId, paymentMode, type, price, paymentStatus, currency) => {
     try {
 
         let desactivationDate = new Date();
@@ -285,6 +285,7 @@ const paysubscription = async (email, transactionId, paymentMode, type, price, c
                 paymentMode,
                 price,
                 currency,
+                paymentStatus,
                 desactivationDate
             }
         }).dataValues
@@ -366,6 +367,22 @@ const signout = async (token, kind) => {
     }
 }
 
+const handleMomoCallBack = async ({ transactionId, price, status }) => {
+    try {
+        const subsccription = await Subscription.findOne({ where: { transactionId } })
+        if ( subsccription && subsccription.price === price && subsccription.paymentMode === "mobile money" && subsccription.paymentStatus === "PENDING") {
+            subsccription.price = price;
+            subsccription.paymentStatus = status
+
+            return await subsccription.save();
+        }
+
+        throw new Error('wrong transaction id or you are trying to update the updated transaction')
+    } catch (error) {
+        throw new Error(error.message)
+    }
+}
+
 module.exports = {
     signup,
     signin,
@@ -379,5 +396,6 @@ module.exports = {
     paysubscription,
     findSubscription,
     updateAccount,
-    signout
+    signout,
+    handleMomoCallBack
 }
