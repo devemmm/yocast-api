@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const Subscription = require('../models/Subscription')
 const User = require('../models/User')
+const moment = require('moment')
 
 
 const {
@@ -311,7 +312,11 @@ const findSubscription = async (email, type) => {
         let subscriptions = []
         switch (type) {
             case 'history':
-                return await findSubscriptions({ email })
+                subscriptions = await findSubscriptions({ email })
+                return subscriptions[0]
+            case 'active':
+                subscriptions = await findSubscriptions({ email, paymentStatus: "SUCCESS", desactivationDate: { $gte: moment().toDate() } });
+                return subscriptions[0]
             case 'last':
                 subscriptions = await findSubscriptions({ email })
                 return subscriptions[0]
@@ -370,7 +375,7 @@ const signout = async (token, kind) => {
 const handleMomoCallBack = async ({ transactionId, price, status }) => {
     try {
         const subsccription = await Subscription.findOne({ where: { transactionId } })
-        if ( subsccription && subsccription.price === price && subsccription.paymentMode === "mobile money" && subsccription.paymentStatus === "PENDING") {
+        if (subsccription && subsccription.price === price && subsccription.paymentMode === "mobile money" && subsccription.paymentStatus === "PENDING") {
             subsccription.price = price;
             subsccription.paymentStatus = status
 
