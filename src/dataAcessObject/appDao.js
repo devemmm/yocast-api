@@ -169,8 +169,10 @@ const remove = async(pk, type, kind)=>{
 const findSubscriptions = async({email, type})=>{
 
     try {
-        if(type= "all"){
+        if(type === "all"){
             return await db.query(`SELECT * FROM Subscriptions ORDER BY createdAt DESC;`, QueryTypes.SELECT)
+        }else if(type === "active"){
+            return await db.query(`SELECT * FROM Subscriptions WHERE owner="${email}" AND paymentStatus = "SUCCESS" AND desactivationDate > now() ORDER BY createdAt DESC LIMIT 40;`, QueryTypes.SELECT)
         }else{
             return await db.query(`SELECT * FROM Subscriptions WHERE owner="${email}" ORDER BY createdAt DESC LIMIT 40;`, QueryTypes.SELECT)
         }
