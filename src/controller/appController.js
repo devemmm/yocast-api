@@ -464,6 +464,64 @@ const responseMomoCont = [
     }
 ]
 
+const paymentInfoCont = [
+    async (req, res) => {
+        res.status(200).json({
+            suscriptions: [
+                {
+                    "name": "premium",
+                    "currency": {
+                        "usd": 40.25,
+                        "rwf": 40000
+                    },
+                    "period": "year",
+                    "offer": [
+                        "Unlimited podcast",
+                        "Unlimited podcast",
+                        "Unlimited podcast"
+                    ],
+                    "discountPercent": '63',
+                    "btnTxt": "GET SPECIAL OFFER"
+                },
+                {
+                    "name": "standard",
+                    "currency": {
+                        "usd": 15.4,
+                        "rwf": 16000
+                    },
+                    "period": "month",
+                    "discountPercent": '29',
+                    "offer": [
+                        "Unlimited podcast",
+                        "Unlimited podcast",
+                        "Unlimited podcast"
+                    ],
+                    "btnTxt": "PAY SUBSCRIPTION"
+                },
+                {
+                    "name": "basic",
+                    "currency": {
+                        "usd": 2.85,
+                        "rwf": 3200
+                    },
+                    "period": "month",
+                    "discountPercent": '0',
+                    "offer": [
+                        "Unlimited podcast",
+                        "Unlimited podcast",
+                        "Unlimited podcast"
+                    ],
+                    "btnTxt": "START NOW"
+                }
+            ],
+            "availablePayment": {
+                "momo": true,
+                "card": true
+            }
+        })
+    }
+]
+
 const paysubscriptionCont = [
     requireAuth, async (req, res) => {
         try {
@@ -603,6 +661,7 @@ module.exports = {
     likePodcast,
     filterPodcastCont,
     paysubscriptionCont,
+    paymentInfoCont,
     responseMomoCont,
     findSubscriptionCont,
     getAllUserSubscription,
